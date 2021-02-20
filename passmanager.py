@@ -5,24 +5,24 @@ import tkinter as tk
 
 #Create window
 window = tk.Tk()
-window.geometry("400x260")
+window.geometry("440x500")
 window.title("Password Management App")
 
 LARGE_FONT= ("Verdana", 11)
-#Databases
 
-#Create a database or connect to one
+# #Create a database or connect to one
 # conn = sqlite3.connect('app_password.db')
 # #Create cursor
 # c = conn.cursor()
 #
 # #Create table
-# # c.execute("""
-# #     CREATE TABLE app_password (
-# #     application text,
-# #     username text,
-# #     password text
-# #     )""")
+# c.execute("""
+#     CREATE TABLE app_password (
+#     id integer primary key autoincrement,
+#     application text,
+#     username text,
+#     password text
+#     )""")
 #
 # #Commit changes
 # conn.commit()
@@ -89,7 +89,7 @@ def store():
 
 #Retrieve section
 retrieve_heading = tk.Label(text="Retrieve Credentials", font=LARGE_FONT)
-retrieve_heading.grid(column=0, row=1)
+retrieve_heading.grid(column=0, row=1, pady=(20,20))
 
 app_name = tk.Label(text="App name")
 app_name.grid(column=0, row=2)
@@ -154,8 +154,81 @@ passwordEntry = tk.Entry(window, width=30)
 passwordEntry.grid(column=1, row=8)
 
 save_button = tk.Button(window, text="Save Credentials", command=store)
-save_button.grid(column=1, row=10)
+save_button.grid(column=1, row=10, pady=(6,0))
 
+#Remove password
+pass_heading = tk.Label(text="Remove Credentials", font=LARGE_FONT)
+pass_heading.grid(column=0, row=11, pady=(20,20))
+
+app_name2 = tk.Label(text="App name")
+app_name2.grid(column=0, row=12)
+
+nameEntry2 = tk.Entry(window, width=30)
+nameEntry2.grid(column=1, row=12)
+
+my_listbox = tk.Listbox(window, width=30, height=4)
+my_listbox.grid(column=1, row=14, pady=(20,20))
+#Add item to listbox
+
+
+def search():
+    #Create a database or connect to one
+    conn = sqlite3.connect('app_password.db')
+    #Create cursor
+    c = conn.cursor()
+
+    row = c.execute("SELECT * FROM app_password WHERE application=:appName",
+            {
+                'appName': nameEntry2.get(),
+
+            }
+        )
+    fetched_info = row.fetchall()
+
+    if fetched_info:
+        my_listbox.delete('0', tk.END)
+        for element in fetched_info:
+            my_listbox.insert(tk.END, "{pk} {appname} {username}".format(pk=element[0], appname=element[1], username=element[2]))
+    else:
+        my_listbox.delete("0", tk.END)
+        my_listbox.insert(tk.END, "No information found")
+
+    #Commit changes
+    conn.commit()
+    #Close connection
+    conn.close()
+
+    return None
+
+search_button = tk.Button(window, text="Search", command=search)
+search_button.grid(column=1, row=13, pady=(6,0))
+
+def delete():
+    #Create a database or connect to one
+    conn = sqlite3.connect('app_password.db')
+    #Create cursor
+    c = conn.cursor()
+
+    selected_item = my_listbox.get(tk.ANCHOR)
+
+    row = c.execute("DELETE FROM app_password WHERE id=:id_no",
+            {
+                'id_no': int(selected_item[0]),
+
+            }
+        )
+
+    my_listbox.delete(tk.ANCHOR)
+    #Commit changes
+    conn.commit()
+    #Close connection
+    conn.close()
+
+    return None
+
+delete_button = tk.Button(window, text="Delete item",
+                command=delete)
+delete_button.grid(column=0, row=14)
 
 window.mainloop()
 
