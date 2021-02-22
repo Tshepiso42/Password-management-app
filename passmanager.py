@@ -193,7 +193,7 @@ class App:
 
     ############## Password encryption functions ###########################
 
-    def generate_key(self):
+    def generate_key():
         key = Fernet.generate_key()
         with open("secret.txt", "wb") as key_file:
             key_file.write(key)
@@ -251,6 +251,6 @@ if __name__ == "__main__":
     # #Step 1: Generate key in textfile
     #     App.generate_key()
     # #Step 2: Create database file
-    #     databaseTable()
-    # #Step 3: Run application
+    #     App.databaseTable()
+    #Step 3: Run application
         startApp()
